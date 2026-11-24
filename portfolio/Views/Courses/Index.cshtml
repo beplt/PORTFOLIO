@@ -1,0 +1,27 @@
+﻿@model List<Course>
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<h1 class="mb-3">My courses</h1>
+
+@if (Model.Count == 0)
+{
+    <p>No courses yet.</p>
+}
+
+<div class="row g-3">
+    @foreach (var course in Model)
+    {
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5">@course.Code · @course.Title</h2>
+                    <p class="text-muted mb-2">@(course.Term ?? "")</p>
+                    <p>@(course.Description ?? "")</p>
+                    <a asp-action="Details" asp-route-id="@course.CourseId" class="btn btn-primary btn-sm">View projects</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

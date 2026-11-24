@@ -1,0 +1,49 @@
+﻿@model ProjectDetails
+@{
+    ViewData["Title"] = Model.Project.Title;
+
+    // Turn a YouTube link into the address of an embeddable player.
+    var videoId = System.Text.RegularExpressions.Regex.Match(
+        Model.Project.VideoUrl ?? "", @"(?:v=|youtu\.be/|shorts/)([A-Za-z0-9_-]{11})").Groups[1].Value;
+}
+
+<h1 class="mb-1">@Model.Project.Title</h1>
+<p class="text-muted">
+    @Model.Course.Code · @Model.Project.StartedOn.ToString("yyyy-MM-dd")
+    @if (Model.Project.CompletedOn != null)
+    {
+        <text> to @Model.Project.CompletedOn.Value.ToString("yyyy-MM-dd")</text>
+    }
+</p>
+
+<p>@(Model.Project.Summary ?? "")</p>
+<p>@(Model.Project.Description ?? "")</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Project.RepoUrl))
+{
+    <p><a href="@Model.Project.RepoUrl" target="_blank" rel="noopener">View the code</a></p>
+}
+
+@if (videoId != "")
+{
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/@videoId" title="Project demo" allowfullscreen></iframe>
+}
+
+@if (Model.Images.Count > 0)
+{
+    <h2 class="h5 mt-4">Images</h2>
+    <div class="row g-3">
+        @foreach (var image in Model.Images)
+        {
+            <div class="col-md-4">
+                <figure class="m-0">
+                    <img src="@image.Url" alt="@(image.Caption ?? Model.Project.Title)" class="img-fluid rounded" />
+                    <figcaption class="small text-muted">@(image.Caption ?? "")</figcaption>
+                </figure>
+            </div>
+        }
+    </div>
+}
+
+<a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Course.CourseId"
+   class="btn btn-link px-0 mt-3">Back to @Model.Course.Code</a>

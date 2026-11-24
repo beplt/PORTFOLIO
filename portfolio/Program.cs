@@ -1,3 +1,4 @@
+using portfolio.Data;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,11 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 var dataSource = NpgsqlDataSource.Create(connectionString);
 builder.Services.AddSingleton(dataSource);
+
+// Repositories: one new object per web request.
+builder.Services.AddScoped<CourseRepository>();
+builder.Services.AddScoped<ProjectRepository>();
+builder.Services.AddScoped<ProjectImageRepository>();
 
 var app = builder.Build();
 
@@ -33,8 +39,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Courses}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
