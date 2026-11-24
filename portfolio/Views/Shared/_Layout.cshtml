@@ -28,6 +28,28 @@
                                 <a class="nav-link text-dark" href="/editor/courses">Editor</a>
                             </li>
                         </ul>
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a>
+                            </li>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/editor/courses">Editor</a>
+                                </li>
+                                <li class="nav-item ms-sm-auto">
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-link nav-link text-dark">Sign out</button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item ms-sm-auto">
+                                    <a class="nav-link text-dark" href="/login">Editor sign-in</a>
+                                </li>
+                            }
+                        </ul>
                     </ul>
                 </div>
             </div>

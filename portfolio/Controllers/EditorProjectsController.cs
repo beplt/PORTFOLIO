@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Npgsql;
@@ -8,6 +9,7 @@ using portfolio.Models;
 namespace portfolio.Controllers;
 
 // Editor side: add, edit and delete projects, with their images.
+[Authorize]
 [Route("editor/projects/[action]/{id?}")]
 public class EditorProjectsController : Controller
 {

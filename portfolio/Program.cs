@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using portfolio.Data;
 using Npgsql;
 
@@ -15,6 +16,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
 var dataSource = NpgsqlDataSource.Create(connectionString);
 builder.Services.AddSingleton(dataSource);
 
+// Sign-in: a cookie proves the editor has signed in. Visitors who are not signed in are sent to /login.
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => options.LoginPath = "/login");
+
 // Repositories: one new object per web request.
 builder.Services.AddScoped<CourseRepository>();
 builder.Services.AddScoped<ProjectRepository>();
@@ -25,13 +30,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    // Friendly pages: anything unexpected goes to /error, and a missing page gets its own 404 page.
+    app.UseExceptionHandler("/error");
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHsts();
+    }
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

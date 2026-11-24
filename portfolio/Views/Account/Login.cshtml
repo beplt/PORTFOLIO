@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Editor sign-in";
+}
+
+<h1 class="mb-3">Editor sign-in</h1>
+
+<form asp-action="Login" method="post" class="card card-body" style="max-width:24rem">
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-control" autofocus />
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Sign in</button>
+        <a asp-controller="Courses" asp-action="Index" class="btn btn-link">Cancel</a>
+    </div>
+</form>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using portfolio.Data;
 using portfolio.Models;
@@ -6,6 +7,7 @@ using portfolio.Models;
 namespace portfolio.Controllers;
 
 // Editor side: add, edit and delete courses.
+[Authorize]
 [Route("editor/courses/[action]/{id?}")]
 public class EditorCoursesController : Controller
 {
