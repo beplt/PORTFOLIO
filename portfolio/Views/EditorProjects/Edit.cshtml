@@ -1,0 +1,20 @@
+﻿@model ProjectForm
+@{
+    ViewData["Title"] = "Edit a project";
+}
+
+<h1 class="mb-3">Edit a project</h1>
+
+<form asp-action="Edit" method="post" class="card card-body" style="max-width:40rem">
+    <input type="hidden" asp-for="ProjectId" />
+    <partial name="_Fields" model="Model" />
+
+    <div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

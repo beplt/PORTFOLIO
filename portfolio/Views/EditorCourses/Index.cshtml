@@ -1,0 +1,39 @@
+﻿@model List<Course>
+@{
+    ViewData["Title"] = "Editor: courses";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-0">Editor: courses</h1>
+        <p class="text-muted mb-0">@Model.Count courses</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">Add a course</a>
+</div>
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Code</th>
+            <th>Title</th>
+            <th>Term</th>
+            <th style="width:12rem"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.Code</td>
+                <td>@course.Title</td>
+                <td>@(course.Term ?? "-")</td>
+                <td class="text-end text-nowrap">
+                    <a asp-action="Edit" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Courses" asp-action="Index" class="btn btn-link px-0">Back to the viewer</a>

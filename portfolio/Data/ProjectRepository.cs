@@ -98,6 +98,93 @@ public class ProjectRepository
         await command.ExecuteNonQueryAsync();
     }
 
+    // READ: every project, newest first.
+    public async Task<List<Project>> GetAllAsync()
+    {
+        const string sql = "SELECT " + Columns + " FROM portfolio.project ORDER BY started_on DESC, project_id DESC;";
+
+        var projects = new List<Project>();
+        await using var command = _dataSource.CreateCommand(sql);
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            projects.Add(ReadProject(reader));
+        }
+        return projects;
+    }
+
+    // CREATE: a project and its images in ONE transaction. If any image fails, nothing is saved.
+    public async Task<long> AddWithImagesAsync(Project project, List<string> imageUrls)
+    {
+        const string sql =
+            "INSERT INTO portfolio.project (course_id, title, summary, description, repo_url, video_url, started_on, completed_on) " +
+            "VALUES (@course_id, @title, @summary, @description, @repo_url, @video_url, @started_on, @completed_on) " +
+            "RETURNING project_id;";
+
+        await using var connection = await _dataSource.OpenConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+
+        long projectId;
+        await using (var insert = new NpgsqlCommand(sql, connection, transaction))
+        {
+            AddParameters(insert, project);
+            projectId = (long)(await insert.ExecuteScalarAsync())!;
+        }
+
+        await InsertImagesAsync(connection, transaction, projectId, imageUrls);
+
+        await transaction.CommitAsync();      // only now is anything saved
+        return projectId;
+    }
+
+    // UPDATE: the project, then its images replaced by the new list, in ONE transaction.
+    public async Task UpdateWithImagesAsync(Project project, List<string> imageUrls)
+    {
+        const string sql =
+            "UPDATE portfolio.project SET course_id = @course_id, title = @title, summary = @summary, " +
+            "description = @description, repo_url = @repo_url, video_url = @video_url, " +
+            "started_on = @started_on, completed_on = @completed_on WHERE project_id = @id;";
+
+        await using var connection = await _dataSource.OpenConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+
+        await using (var update = new NpgsqlCommand(sql, connection, transaction))
+        {
+            AddParameters(update, project);
+            update.Parameters.AddWithValue("id", project.ProjectId);
+            await update.ExecuteNonQueryAsync();
+        }
+
+        await using (var delete = new NpgsqlCommand(
+            "DELETE FROM portfolio.project_image WHERE project_id = @id;", connection, transaction))
+        {
+            delete.Parameters.AddWithValue("id", project.ProjectId);
+            await delete.ExecuteNonQueryAsync();
+        }
+
+        await InsertImagesAsync(connection, transaction, project.ProjectId, imageUrls);
+
+        await transaction.CommitAsync();
+    }
+
+    // Inserts each URL as an image, numbered 1, 2, 3 ... in the order given.
+    private static async Task InsertImagesAsync(
+        NpgsqlConnection connection, NpgsqlTransaction transaction, long projectId, List<string> imageUrls)
+    {
+        var order = 1;
+        foreach (var url in imageUrls)
+        {
+            await using var insert = new NpgsqlCommand(
+                "INSERT INTO portfolio.project_image (project_id, url, sort_order) VALUES (@project_id, @url, @sort_order);",
+                connection, transaction);
+            insert.Parameters.AddWithValue("project_id", projectId);
+            insert.Parameters.AddWithValue("url", url);
+            insert.Parameters.AddWithValue("sort_order", order);
+            await insert.ExecuteNonQueryAsync();
+            order++;
+        }
+    }
+
     // The eight parameters that INSERT and UPDATE share.
     private static void AddParameters(NpgsqlCommand command, Project project)
     {

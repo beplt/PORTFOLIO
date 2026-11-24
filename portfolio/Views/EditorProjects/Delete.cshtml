@@ -1,0 +1,22 @@
+﻿@model Project
+@{
+    ViewData["Title"] = "Delete a project";
+}
+
+<h1 class="mb-3">Delete a project</h1>
+
+<div class="card card-body" style="max-width:36rem">
+    <p>Are you sure you want to delete this project?</p>
+    <dl class="row mb-2">
+        <dt class="col-4">Title</dt>
+        <dd class="col-8">@Model.Title</dd>
+        <dt class="col-4">Started</dt>
+        <dd class="col-8">@Model.StartedOn.ToString("yyyy-MM-dd")</dd>
+    </dl>
+    <p class="text-muted small">Its images are deleted with it.</p>
+
+    <form asp-action="Delete" asp-route-id="@Model.ProjectId" method="post">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-link">Cancel</a>
+    </form>
+</div>
