@@ -5,8 +5,7 @@
 
 <h1 class="mb-3">Edit a project</h1>
 
-<form asp-action="Edit" method="post" class="card card-body" style="max-width:40rem">
-    <input type="hidden" asp-for="ProjectId" />
+<form asp-action="Edit" method="post" data-image-check class="card card-body" style="max-width:40rem">    <input type="hidden" asp-for="ProjectId" />
     <partial name="_Fields" model="Model" />
 
     <div>
@@ -17,4 +16,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/project-form.js" asp-append-version="true"></script>
 }

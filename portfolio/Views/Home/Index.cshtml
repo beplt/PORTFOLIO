@@ -1,8 +1,62 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="hero">
+    <span class="hero-orb orb-1"></span>
+    <span class="hero-orb orb-2"></span>
+    <div class="hero-body">
+        <p class="hero-eyebrow">✦ My portfolio ✦</p>
+        <h1 class="hero-title">Hi, I'm <span>Arwen</span>.</h1>
+        <p class="hero-text">
+            I build websites and databases. Here are the courses I took
+            and the projects I made in them.
+        </p>
+        <div class="hero-actions">
+            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-lg">See my courses</a>
+            <a href="#latest" class="btn btn-hero-ghost btn-lg">Latest projects</a>
+        </div>
+        <div class="hero-stats">
+            <div><strong>@Model.Courses.Count</strong><span>courses</span></div>
+            <div><strong>@Model.ProjectCount</strong><span>projects</span></div>
+        </div>
+    </div>
+</section>
+
+<h2 class="section-title">My courses</h2>
+<div class="chip-row">
+    @foreach (var course in Model.Courses)
+    {
+        <a asp-controller="Courses" asp-action="Details" asp-route-id="@course.CourseId" class="course-chip">
+            <strong>@course.Code</strong>
+            <span>@course.Title</span>
+        </a>
+    }
+</div>
+
+<h2 class="section-title" id="latest">Latest projects</h2>
+@if (Model.Featured.Count == 0)
+{
+    <p class="text-muted">No projects yet.</p>
+}
+<div class="row g-4">
+    @foreach (var item in Model.Featured)
+    {
+        <div class="col-md-4">
+            <a asp-controller="Projects" asp-action="Details" asp-route-id="@item.Project.ProjectId" class="project-card">
+                <div class="project-cover">
+                    @if (item.CoverUrl != null)
+                    {
+                        <img src="@item.CoverUrl" alt="@item.Project.Title" />
+                    }
+                </div>
+                <div class="project-info">
+                    <span class="project-tag">@item.CourseCode</span>
+                    <h3>@item.Project.Title</h3>
+                    <p>@(item.Project.Summary ?? "")</p>
+                </div>
+            </a>
+        </div>
+    }
 </div>
